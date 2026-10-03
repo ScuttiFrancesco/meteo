@@ -8,7 +8,7 @@
       "schematics": {},
       "root": "",
       "sourceRoot": "src",
-      "prefix": "app",
+      "prefix": "fra",
       "architect": {
         "build": {
           "builder": "@angular/build:application",
@@ -27,11 +27,6 @@
                 "glob": "**/*",
                 "input": "src/assets",
                 "output": "assets"
-              },
-              {
-                "glob": "**/*.svg",
-                "input": "node_modules/ionicons/dist/ionicons/svg",
-                "output": "./svg"
               }
             ],
             "styles": ["src/global.scss", "src/theme/variables.scss"],
@@ -119,17 +114,24 @@
   },
   "cli": {
     "schematicCollections": [
+      "@schematics/angular",
       "@ionic/angular-toolkit"
     ]
   },
   "schematics": {
+    "@schematics/angular:component": {
+      "inlineTemplate": true,
+      "inlineStyle": true,
+      "style": "scss",
+      "type": "component"
+    },
     "@ionic/angular-toolkit:component": {
       "styleext": "scss",
-      "standalone": false
+      "standalone": true
     },
     "@ionic/angular-toolkit:page": {
       "styleext": "scss",
-      "standalone": false
+      "standalone": true
     }
   }
 }

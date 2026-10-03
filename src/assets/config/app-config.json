@@ -1,0 +1,5 @@
+{
+  "username": "John Doe",
+  "meteoArchiveUrl": "https://archive-api.open-meteo.com/v1/archive",
+  "meteoForecastUrl": "https://api.open-meteo.com/v1/forecast"
+}
