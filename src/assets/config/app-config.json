@@ -1,5 +1,18 @@
 {
   "username": "John Doe",
   "meteoArchiveUrl": "https://archive-api.open-meteo.com/v1/archive",
-  "meteoForecastUrl": "https://api.open-meteo.com/v1/forecast"
+  "meteoForecastUrl": "https://api.open-meteo.com/v1/forecast",
+  "geocodingUrl": "https://nominatim.openstreetmap.org/search",
+  "geocodingQueryParams": {
+    "inputParams": {
+      "address": "street",
+      "city": "city",
+      "countryPrefix": "country"
+    },
+    "staticParams": {
+      "format": "jsonv2",
+      "addressdetails": "1",
+      "limit": "5"
+    }
+  }
 }

@@ -44,7 +44,7 @@ import { ISettings } from './models/ISettings';
           <ion-content>
             <ion-list id="inbox-list">
               <ion-list-header>Inbox</ion-list-header>
-              <ion-note>Ciao {{ userName }}</ion-note>
+              <ion-note>Ciao {{ username }}</ion-note>
 
               @for (p of appPages; track p; let i = $index) {
               <ion-menu-toggle auto-hide="false">
@@ -174,7 +174,7 @@ ion-item.selected {
 })
 export class AppComponent {
   private config: ISettings = inject(AppConfig);
-  protected readonly userName = this.config.userName ?? 'User';
+  protected readonly username = this.config.username ?? 'User';
   protected readonly appPages = [
     { title: 'Inbox', url: '/folder/Inbox', icon: 'mail' },
     { title: 'Outbox', url: '/folder/Outbox', icon: 'paper-plane' },

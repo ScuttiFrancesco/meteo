@@ -9,7 +9,6 @@ import localeItExtra from '@angular/common/locales/extra/it';
 import { AppComponent } from './app/app.component';
 
 
-
 const _configFilePath = 'assets/config/app-config.json';
  
 fetch(_configFilePath)

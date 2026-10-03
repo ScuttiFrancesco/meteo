@@ -1,5 +1,10 @@
 export interface ISettings {
-  userName: string;
+  username: string;
   meteoArchiveUrl: string;
   meteoForecastUrl: string;
+  geocodingUrl: string;
+  geocodingQueryParams: { 
+    inputParams: Record<string, string>;
+    staticParams: Record<string, string> 
+  };
 }
