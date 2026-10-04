@@ -3,3 +3,10 @@ export interface ICoordinatesParams {
   city: string;
   countryPrefix?: string;
 }
+
+export interface IMeteoParams {
+  latitude: string;
+  longitude: string;
+  start_date: string;
+  end_date: string;
+}

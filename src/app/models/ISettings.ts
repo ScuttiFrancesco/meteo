@@ -7,4 +7,8 @@ export interface ISettings {
     inputParams: Record<string, string>;
     staticParams: Record<string, string> 
   };
+  meteoQueryParams: {
+    inputParams: Record<string, string>;
+    staticParams: Record<string, string>
+  };
 }

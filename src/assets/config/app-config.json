@@ -14,5 +14,18 @@
       "addressdetails": "1",
       "limit": "5"
     }
+  },
+  "meteoQueryParams": {
+    "inputParams": {
+      "latitude": "latitude",
+      "longitude": "longitude",
+      "start_date": "start_date",
+      "end_date": "end_date"
+    },
+    "staticParams": {
+      "hourly": "temperature_2m,relativehumidity_2m,apparent_temperature,precipitation,rain,snowfall,cloudcover,windspeed_10m,windgusts_10m,winddirection_10m",
+      "daily": "temperature_2m_max,temperature_2m_min,apparent_temperature_max,apparent_temperature_min,sunrise,sunset",
+      "timezone": "auto"
+    }
   }
 }
