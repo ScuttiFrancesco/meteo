@@ -1,5 +1,5 @@
 {
-  "username": "John Doe",
+  "username": "Francesco",
   "meteoArchiveUrl": "https://archive-api.open-meteo.com/v1/archive",
   "meteoForecastUrl": "https://api.open-meteo.com/v1/forecast",
   "geocodingUrl": "https://nominatim.openstreetmap.org/search",
@@ -27,5 +27,6 @@
       "daily": "temperature_2m_max,temperature_2m_min,apparent_temperature_max,apparent_temperature_min,sunrise,sunset",
       "timezone": "auto"
     }
-  }
+  },
+  "storageKey": ["address", "city", "countryPrefix"]
 }

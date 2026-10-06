@@ -1,7 +1,7 @@
 export interface ICoordinatesParams {
   address: string;
   city: string;
-  countryPrefix?: string;
+  countryPrefix: string;
 }
 
 export interface IMeteoParams {

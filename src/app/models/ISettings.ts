@@ -1,3 +1,5 @@
+import { ICoordinatesParams } from "./IQueryParams";
+
 export interface ISettings {
   username: string;
   meteoArchiveUrl: string;
@@ -11,4 +13,5 @@ export interface ISettings {
     inputParams: Record<string, string>;
     staticParams: Record<string, string>
   };
+  storageKey: (keyof ICoordinatesParams)[]
 }

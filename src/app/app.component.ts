@@ -17,33 +17,23 @@ import {
 } from '@ionic/angular';
 import { addIcons } from 'ionicons';
 import {
-  archiveOutline,
-  archiveSharp,
-  bookmarkOutline,
-  bookmarkSharp,
   heartOutline,
   heartSharp,
-  mailOutline,
-  mailSharp,
-  paperPlaneOutline,
-  paperPlaneSharp,
-  trashOutline,
-  trashSharp,
-  warningOutline,
-  warningSharp,
+  homeOutline,
+  homeSharp,
 } from 'ionicons/icons';
 import { AppConfig } from './app-config-token';
 import { ISettings } from './models/ISettings';
 
 @Component({
-  selector: 'app-root',
+  selector: 'fra-root',
   template: `
     <ion-app>
       <ion-split-pane contentId="main-content">
         <ion-menu contentId="main-content" type="overlay">
           <ion-content>
             <ion-list id="inbox-list">
-              <ion-list-header>Inbox</ion-list-header>
+              <ion-list-header>Meteo App</ion-list-header>
               <ion-note>Ciao {{ username }}</ion-note>
 
               @for (p of appPages; track p; let i = $index) {
@@ -176,29 +166,15 @@ export class AppComponent {
   private config: ISettings = inject(AppConfig);
   protected readonly username = this.config.username ?? 'User';
   protected readonly appPages = [
-    { title: 'Inbox', url: '/folder/Inbox', icon: 'mail' },
-    { title: 'Outbox', url: '/folder/Outbox', icon: 'paper-plane' },
-    { title: 'Favorites', url: '/folder/Favorites', icon: 'heart' },
-    { title: 'Archived', url: '/folder/Archived', icon: 'archive' },
-    { title: 'Trash', url: '/folder/Trash', icon: 'trash' },
-    { title: 'Spam', url: '/folder/Spam', icon: 'warning' },
+    { title: 'Home', url: '/folder/Home', icon: 'home' },
+    { title: 'Favorites', url: '/folder/Favorites', icon: 'heart' }   
   ];
   constructor() {
     addIcons({
-      archiveOutline,
-      archiveSharp,
-      bookmarkOutline,
-      bookmarkSharp,
+      homeOutline,
+      homeSharp,
       heartOutline,
-      heartSharp,
-      mailOutline,
-      mailSharp,
-      paperPlaneOutline,
-      paperPlaneSharp,
-      trashOutline,
-      trashSharp,
-      warningOutline,
-      warningSharp,
+      heartSharp,      
     });
   }
 }
