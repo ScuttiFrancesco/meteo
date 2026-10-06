@@ -35,3 +35,13 @@
 /* @import "@ionic/angular/css/palettes/dark.always.css"; */
 /* @import "@ionic/angular/css/palettes/dark.class.css"; */
 @import "@ionic/angular/css/palettes/dark.system.css";
+
+/* Toast globali (ToastService): vivono fuori dai componenti, quindi lo stile sta qui */
+ion-toast.fra-toast {
+  --border-radius: 12px;
+  --box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
+  --width: auto;
+  --max-width: 90%;
+  font-size: 1rem;
+  font-weight: 500;
+}
