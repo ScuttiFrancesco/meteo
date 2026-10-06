@@ -84,7 +84,7 @@ export class AddFavoriteModalComponent {
     const payload: ICoordinatesParams = {
       address: this.favorite().address.trim(),
       city: this.favorite().city.trim(),
-      countryPrefix: this.favorite().countryPrefix.trim()
+      countryPrefix: this.favorite().countryPrefix.trim() || 'it'
     }
     const exists = this.storageService.checkIfExists(payload)
     if(exists){

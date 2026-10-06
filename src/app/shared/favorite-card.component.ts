@@ -1,4 +1,4 @@
-import { Component, ElementRef, inject, input, model, output } from '@angular/core';
+import { Component, ElementRef, inject, input, output } from '@angular/core';
 import { ActionSheetController, CheckboxCustomEvent, IonCard, IonCheckbox, IonItem, IonLabel } from '@ionic/angular';
 import { StorageService } from '../core/services/storage.service';
 import { ICoordinatesParams } from '../models/IQueryParams';
@@ -55,7 +55,7 @@ const LONG_PRESS_MS = 500
           <p>{{ item().city }}</p>
         </ion-label>
         <ion-checkbox slot="end" aria-label="Favorite"
-                      [checked]="favorite()"
+                      [checked]="storageService.isSelected(item())"
                       (ionChange)="favoriteToogle($event)"
         ></ion-checkbox>
       </ion-item>
@@ -64,9 +64,8 @@ const LONG_PRESS_MS = 500
 })
 export class FavoriteCardComponent {
   private actionSheetCtrl = inject(ActionSheetController)
-  private storageService = inject(StorageService)
+  protected storageService = inject(StorageService)
   public item = input.required<ICoordinatesParams>()
-  public favorite = model(false)
   public deleted = output<ICoordinatesParams>()
   private pressTimer?: ReturnType<typeof setTimeout>
   private longPressed = false
@@ -83,7 +82,8 @@ export class FavoriteCardComponent {
   }
 
   protected favoriteToogle(event: CheckboxCustomEvent){
-    this.favorite.set(event.detail.checked)
+    // ionChange scatta solo su interazione utente: le altre card si deselezionano via selectedKey
+    this.storageService.setSelected(event.detail.checked ? this.item() : null)
   }
 
   protected startPress(event: PointerEvent){
