@@ -24,6 +24,7 @@ import {
 } from 'ionicons/icons';
 import { AppConfig } from './app-config-token';
 import { ISettings } from './models/ISettings';
+import { NotificationService } from './core/services/notification.service';
 
 @Component({
   selector: 'fra-root',
@@ -170,6 +171,8 @@ export class AppComponent {
     { title: 'Favorites', url: '/folder/Favorites', icon: 'heart' }   
   ];
   constructor() {
+    // avvia l'invio di località e orari al runner delle notifiche
+    inject(NotificationService);
     addIcons({
       homeOutline,
       homeSharp,

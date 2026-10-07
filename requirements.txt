@@ -1,0 +1,62 @@
+METEO ALERT - REQUISITI
+=======================
+
+Le dipendenze npm sono già dichiarate in package.json e si installano con
+"npm install". Questo file elenca gli strumenti da installare a mano sul PC
+e i requisiti del telefono.
+
+
+1. STRUMENTI SUL PC
+-------------------
+
+Node.js        >= 22.22.3 (oppure >= 24.15.0)
+               Angular 22 e Capacitor 8 si rifiutano di partire con Node 20.
+               Consigliato: l'ultima LTS da https://nodejs.org
+               Verifica: node -v
+
+npm            >= 10 (incluso in Node.js)
+               Verifica: npm -v
+
+JDK            21
+               Il più semplice è usare quello incluso in Android Studio
+               (Settings > Build, Execution, Deployment > Build Tools > Gradle > Gradle JDK).
+               Verifica: java -version
+
+Android Studio ultima versione stabile
+               Il progetto usa Android Gradle Plugin 8.13 e Gradle 8.14.3.
+
+Android SDK    da installare con Android Studio > Tools > SDK Manager:
+               - SDK Platforms: Android 16 (API 36)
+                 (compileSdk e targetSdk del progetto sono 36)
+               - SDK Tools: Android SDK Build-Tools, Android SDK Platform-Tools (adb)
+
+Google Chrome  per il debug della WebView da chrome://inspect
+
+Ionic CLI      facoltativa: serve solo per il live reload (ionic cap run -l)
+               npm install -g @ionic/cli
+
+
+2. PACCHETTI NPM PRINCIPALI (già in package.json)
+-------------------------------------------------
+
+@angular/*                      22.1.x
+@ionic/angular                  ^9.0.0
+@capacitor/core                 ^8.5.2
+@capacitor/cli                  ^8.5.2   (devDependency)
+@capacitor/android              ^8.5.2
+@capacitor/background-runner    ^3.0.0
+@capacitor-community/sqlite     ^8.1.1
+
+
+3. TELEFONO ANDROID
+-------------------
+
+Versione minima        Android 7.0 (API 24, minSdk del progetto)
+Debug USB              Impostazioni > Info sul telefono > tocca 7 volte "Numero build",
+                       poi Opzioni sviluppatore > Debug USB
+Notifiche              da Android 13 l'app deve chiedere il permesso al primo avvio
+Allarmi esatti         da Android 12 servono per far arrivare le notifiche all'orario preciso
+                       (vedi README, sezione "Notifiche a orario")
+Batteria               Impostazioni > App > Meteo Alert > Batteria > Senza restrizioni
+                       (Xiaomi, Huawei, Oppo, ecc.: attivare anche l'avvio automatico,
+                       istruzioni per marca su https://dontkillmyapp.com)

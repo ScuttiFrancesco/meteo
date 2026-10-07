@@ -13,5 +13,7 @@ export interface ISettings {
     inputParams: Record<string, string>;
     staticParams: Record<string, string>
   };
-  storageKey: (keyof ICoordinatesParams)[]
+  storageKey: (keyof ICoordinatesParams)[];
+  // orari delle notifiche meteo nel formato HH:mm, ora locale del telefono
+  notificationTimes: string[];
 }
