@@ -14,7 +14,8 @@ export const appConfig: ApplicationConfig = {
       withInterceptors([ errorInterceptor]),
       withFetch()
     ),
-    provideIonicAngular(),
+    // useSetInputAPI: i componentProps delle modali vengono passati con setInput, così funzionano con i signal input()
+    provideIonicAngular({ useSetInputAPI: true }),
     provideRouter(routes, withPreloading(PreloadAllModules), withComponentInputBinding()),
   ],
 };

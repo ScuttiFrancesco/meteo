@@ -1,2 +1,13 @@
 // For information on how to create your own theme, please refer to:
 // https://ionicframework.com/docs/theming/
+
+// colore primario (header, menu laterale): questo file è caricato dopo global.scss,
+// quindi sovrascrive anche il primary della palette dark
+:root {
+  --ion-color-primary: #9857ff;
+  --ion-color-primary-rgb: 80, 18, 180;
+  --ion-color-primary-contrast: #ffffff;
+  --ion-color-primary-contrast-rgb: 255, 255, 255;
+  --ion-color-primary-shade: #6628ca;
+  --ion-color-primary-tint: #7f45dd;
+}

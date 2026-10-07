@@ -30,11 +30,11 @@ export class ApiService {
         return queryParam ? { url: this.config.meteoArchiveUrl, params: this.buildParamsMeteo(queryParam) } : undefined;
         }, { defaultValue: null });
 
-    public setCoordinates(params: ICoordinatesParams): void {
+    public setCoordinates(params: ICoordinatesParams | null): void {
         this.coordinatesParam.set(params);
     }
 
-    public setMeteo(params: IMeteoParams): void {
+    public setMeteo(params: IMeteoParams | null): void {
         this.meteoForecastParam.set(params);
     }
 
