@@ -22,16 +22,20 @@ const LONG_PRESS_MS = 500
       --background: rgb(255, 239, 239);
       --color: black;
     }
+    /* testo che scala con lo schermo; gli indirizzi lunghi vanno a capo invece di essere troncati */
     ion-label h2 {
-      font-size: 32px;
+      font-size: clamp(18px, 5.5vw, 28px);
+      line-height: 1.2;
+      overflow-wrap: anywhere;
     }
     ion-label p {
-      font-size: 24px;
+      font-size: clamp(14px, 4.2vw, 20px);
       font-weight: 500;
       color: black;
+      overflow-wrap: anywhere;
     }
     ion-checkbox {
-      --size: 32px;
+      --size: clamp(24px, 7vw, 32px);
       --checkbox-background-checked: #6815ec;
       --checkmark-color: #2e7d32;
     }
@@ -50,7 +54,7 @@ const LONG_PRESS_MS = 500
       (contextmenu)="$event.preventDefault()"
     >
       <ion-item lines="none">
-        <ion-label>
+        <ion-label class="ion-text-wrap">
           <h2>{{ item().address }}</h2>
           <p>{{ item().city }}</p>
         </ion-label>

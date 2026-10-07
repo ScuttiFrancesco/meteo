@@ -28,6 +28,5 @@
       "timezone": "auto"
     }
   },
-  "storageKey": ["address", "city", "countryPrefix"],
-  "notificationTimes": ["08:00", "17:00"]
+  "storageKey": ["address", "city", "countryPrefix"]
 }

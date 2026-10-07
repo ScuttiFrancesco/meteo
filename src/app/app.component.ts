@@ -21,6 +21,8 @@ import {
   heartSharp,
   homeOutline,
   homeSharp,
+  notificationsOutline,
+  notificationsSharp,
 } from 'ionicons/icons';
 import { AppConfig } from './app-config-token';
 import { ISettings } from './models/ISettings';
@@ -168,7 +170,8 @@ export class AppComponent {
   protected readonly username = this.config.username ?? 'User';
   protected readonly appPages = [
     { title: 'Home', url: '/folder/Home', icon: 'home' },
-    { title: 'Favorites', url: '/folder/Favorites', icon: 'heart' }   
+    { title: 'Favorites', url: '/folder/Favorites', icon: 'heart' },
+    { title: 'Notifications', url: '/folder/Notifications', icon: 'notifications' }
   ];
   constructor() {
     // avvia l'invio di località e orari al runner delle notifiche
@@ -177,7 +180,9 @@ export class AppComponent {
       homeOutline,
       homeSharp,
       heartOutline,
-      heartSharp,      
+      heartSharp,
+      notificationsOutline,
+      notificationsSharp,
     });
   }
 }

@@ -41,7 +41,8 @@ function dayFromToday(offset: number): string {
     flex-direction: column;
     height: 100%;
     padding: 16px;
-    padding-bottom: calc(20vh + 16px);
+    /* spazio per il footer chiuso, che mostra solo la maniglia */
+    padding-bottom: calc(48px + env(safe-area-inset-bottom));
   }
   .glass {
     color: var(--fra-text);
@@ -51,22 +52,34 @@ function dayFromToday(offset: number): string {
     -webkit-backdrop-filter: blur(16px);
     box-shadow: 0 8px 32px rgba(0, 0, 0, 0.18);
   }
+  /* coordinate, regione e paese sempre sulla stessa riga: se non c'è spazio il testo si tronca */
   .card-info {
     display: flex;
-    flex-wrap: wrap;
     justify-content: space-between;
     align-items: center;
-    gap: 8px;
+    gap: 6px;
     width: 100%;
+    font-size: clamp(10px, 3.2vw, 13px);
   }
-  .country {
+  .pill {
     display: inline-flex;
     align-items: center;
-    gap: 6px;
-    padding: 4px 12px;
+    gap: 4px;
+    min-width: 0;
+    padding: 4px 8px;
     border-radius: 999px;
-    font-size: 13px;
     font-weight: 600;
+    white-space: nowrap;
+  }
+  .pill > ion-icon, .pill > img {
+    flex-shrink: 0;
+  }
+  .pill-text {
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .region, .country {
     background: rgba(0, 0, 0, 0.06);
   }
   .country img {
@@ -80,7 +93,7 @@ function dayFromToday(offset: number): string {
     display: flex;
     flex-direction: column;
     align-items: center;
-    padding: 24px 20px;
+    padding: 10px clamp(12px, 4vw, 20px) 12px;
     text-align: center;
     border-radius: 24px;
     animation: fade-in 0.4s ease both;
@@ -89,28 +102,26 @@ function dayFromToday(offset: number): string {
     display: flex;
     align-items: center;
     gap: 6px;
+    max-width: 100%;
     margin: 0;
-    font-size: 14px;
+    font-size: clamp(11px, 3.4vw, 14px);
     font-weight: 600;
     letter-spacing: 0.06em;
     text-transform: uppercase;
     color: var(--fra-muted);
   }
   .road ion-icon {
-    font-size: 18px;
+    flex-shrink: 0;
+    font-size: 1.3em;
     color: var(--fra-accent);
   }
   h1 {
-    margin: 4px 0;
-    font-size: clamp(36px, 10vw, 52px);
+    margin: 2px 0 0;
+    font-size: clamp(28px, 9vw, 52px);
     font-weight: 700;
-    line-height: 1.1;
+    line-height: 1.05;
     letter-spacing: -0.02em;
-  }
-  .region {
-    margin: 0;
-    font-size: 15px;
-    color: var(--fra-muted);
+    overflow-wrap: anywhere;
   }
   .current {
     display: flex;
@@ -118,24 +129,16 @@ function dayFromToday(offset: number): string {
     gap: 12px;
   }
   .temperature {
-    font-size: clamp(32px, 9vw, 48px);
+    font-size: clamp(28px, 8.5vw, 48px);
     font-weight: 700;
     letter-spacing: -0.02em;
   }
   .meteo-icon {
-    height: clamp(100px, 20vw, 180px);
-    margin: 8px 0 8px;
+    height: clamp(64px, 18vw, 128px);
     filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.25));
     animation: float 4s ease-in-out infinite;
   }
   .coords {
-    display: inline-flex;
-    align-items: center;
-    gap: 6px;
-    padding: 4px 12px;
-    border-radius: 999px;
-    font-size: 13px;
-    font-weight: 600;
     font-variant-numeric: tabular-nums;
     color: var(--fra-accent);
     background: rgba(104, 21, 236, 0.1);
@@ -174,7 +177,8 @@ function dayFromToday(offset: number): string {
     z-index: 10;
     display: flex;
     flex-direction: column;
-    height: 17vh;
+    max-height: 85vh;
+    padding-bottom: env(safe-area-inset-bottom);
     color: black;
     background-color: rgba(255, 239, 239, 0.92);
     backdrop-filter: blur(16px);
@@ -182,14 +186,11 @@ function dayFromToday(offset: number): string {
     border-top: 1px solid var(--fra-surface-border);
     border-radius: 24px 24px 0 0;
     box-shadow: 0 -4px 24px rgba(0, 0, 0, 0.18);
-    transition: height 0.3s ease;
-  }
-  .footer.expanded {
-    height: 32vh;
   }
   .footer-handle {
+    flex-shrink: 0;
     width: 100%;
-    padding: 12px 0;
+    padding: 14px 0;
     background: none;
     border: none;
     cursor: pointer;
@@ -203,20 +204,35 @@ function dayFromToday(offset: number): string {
     border-radius: 3px;
     background-color: rgba(0, 0, 0, 0.2);
   }
+  /* chiuso: riga a 0fr, si vede solo la maniglia; aperto: 1fr, altezza del contenuto (tutte le card) */
+  .footer-body {
+    display: grid;
+    grid-template-rows: 0fr;
+    min-height: 0;
+    transition: grid-template-rows 0.3s ease;
+  }
+  .footer.expanded .footer-body {
+    grid-template-rows: 1fr;
+  }
   .footer-content {
-    flex: 1;
+    min-height: 0;
+    overflow: hidden;
+    padding: 0 12px;
+  }
+  .footer.expanded .footer-content {
     overflow-y: auto;
-    padding: 0 16px calc(16px + env(safe-area-inset-bottom));
   }
   .footer-state {
-    margin: 0;
+    margin: 0 0 16px;
     text-align: center;
     color: var(--fra-muted);
   }
   .days {
     display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 8px;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 6px;
+    max-width: 600px;
+    margin: 0 auto 12px;
   }
   .day {
     display: flex;
@@ -225,7 +241,8 @@ function dayFromToday(offset: number): string {
     gap: 4px;
     padding: 10px 4px;
     font: inherit;
-    font-size: 13px;
+    font-size: clamp(11px, 3.2vw, 13px);
+    line-height: 1.25;
     color: inherit;
     background: rgba(0, 0, 0, 0.05);
     border: none;
@@ -233,14 +250,14 @@ function dayFromToday(offset: number): string {
     cursor: pointer;
   }
   .day-label {
-    font-size: 12px;
+    font-size: clamp(10px, 2.9vw, 12px);
     font-weight: 700;
-    letter-spacing: 0.06em;
+    letter-spacing: 0.04em;
     text-transform: uppercase;
     color: var(--fra-accent);
   }
   .day-temp {
-    font-size: 16px;
+    font-size: clamp(13px, 3.9vw, 16px);
     font-weight: 700;
   }
   .day-feels {
@@ -261,6 +278,9 @@ function dayFromToday(offset: number): string {
   @media (prefers-reduced-motion: reduce) {
     .card, .meteo-icon {
       animation: none;
+    }
+    .footer-body {
+      transition: none;
     }
   }
   `,
@@ -291,10 +311,7 @@ function dayFromToday(offset: number): string {
             @if (place.road) {
               <p class="road"><ion-icon name="location-outline" aria-hidden="true"></ion-icon>{{ place.road }}</p>
             }
-            <h1>{{ place.city }}</h1>
-            @if (place.region) {
-              <p class="region">{{ place.region }}</p>
-            }
+            <h1>{{ place.city }}</h1>            
             @if (current(); as current) {
               <div class="current">
                 <img class="meteo-icon" [src]="current.icon" [alt]="current.condition"/>
@@ -302,8 +319,11 @@ function dayFromToday(offset: number): string {
               </div>
             }
             <div class="card-info">
-              <span class="coords"><ion-icon name="compass-outline" aria-hidden="true"></ion-icon>{{ place.coords }}</span>
-              <span class="country"><img [src]="place.flag" alt="">{{ place.country }}</span>
+              <span class="pill coords"><ion-icon name="compass-outline" aria-hidden="true"></ion-icon><span class="pill-text">{{ place.coords }}</span></span>
+              @if (place.region) {
+                <span class="pill region"><span class="pill-text">{{ place.region }}</span></span>
+              }
+              <span class="pill country"><img [src]="place.flag" alt=""><span class="pill-text">{{ place.country }}</span></span>
             </div>
           </section>
         } @else {
@@ -323,24 +343,27 @@ function dayFromToday(offset: number): string {
         aria-label="Espandi o riduci il footer"
         (click)="footerExpanded.update(expanded => !expanded)"
       ></button>
-      <div class="footer-content">
-        @if (meteo.isLoading()) {
-          <div class="footer-state"><ion-spinner name="crescent"></ion-spinner></div>
-        } @else if (meteo.error()) {
-          <p class="footer-state">Unable to load the weather.</p>
-        } @else {
-          <div class="days">
-            @for (day of days(); track day.date) {
-              <button type="button" class="day" (click)="openHourly(day.date, day.label)">
-                <span class="day-label">{{ day.label }}</span>
-                <span class="day-temp">{{ day.max }} / {{ day.min }}</span>
-                <span class="day-feels">Feels {{ day.feelsMax }} / {{ day.feelsMin }}</span>
-                <span><ion-icon name="sunny-outline" aria-label="Sunrise"></ion-icon>{{ day.sunrise }}</span>
-                <span><ion-icon name="moon-outline" aria-label="Sunset"></ion-icon>{{ day.sunset }}</span>
-              </button>
-            }
-          </div>
-        }
+      <!-- inert da chiuso: le card nascoste non devono ricevere focus né tap -->
+      <div class="footer-body" [attr.inert]="footerExpanded() ? null : ''">
+        <div class="footer-content">
+          @if (meteo.isLoading()) {
+            <div class="footer-state"><ion-spinner name="crescent"></ion-spinner></div>
+          } @else if (meteo.error()) {
+            <p class="footer-state">Unable to load the weather.</p>
+          } @else {
+            <div class="days">
+              @for (day of days(); track day.date) {
+                <button type="button" class="day" (click)="openHourly(day.date, day.label)">
+                  <span class="day-label">{{ day.label }}</span>
+                  <span class="day-temp">{{ day.max }} / {{ day.min }}</span>
+                  <span class="day-feels">Feels {{ day.feelsMax }} / {{ day.feelsMin }}</span>
+                  <span><ion-icon name="sunny-outline" aria-label="Sunrise"></ion-icon>{{ day.sunrise }}</span>
+                  <span><ion-icon name="moon-outline" aria-label="Sunset"></ion-icon>{{ day.sunset }}</span>
+                </button>
+              }
+            </div>
+          }
+        </div>
       </div>
     </footer>
   `,

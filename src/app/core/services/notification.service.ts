@@ -1,8 +1,6 @@
 import { effect, inject, Service } from '@angular/core';
 import { Capacitor } from '@capacitor/core';
 import { BackgroundRunner } from '@capacitor/background-runner';
-import { ISettings } from '../../models/ISettings';
-import { AppConfig } from '../../app-config-token';
 import { ApiService } from './api.service';
 import { StorageService } from './storage.service';
 
@@ -10,10 +8,10 @@ import { StorageService } from './storage.service';
 const RUNNER_LABEL = 'it.fra.meteoalert.check'
 
 // passa al runner (src/runners/runner.js) la località del preferito selezionato e gli orari
-// delle notifiche: è il runner, anche ad app chiusa, a scaricare il meteo e programmarle
+// delle notifiche scelti nella pagina Notifications: è il runner, anche ad app chiusa,
+// a scaricare il meteo e programmarle
 @Service()
 export class NotificationService {
-    private config: ISettings = inject(AppConfig)
     private apiService = inject(ApiService)
     private storageService = inject(StorageService)
 
@@ -33,7 +31,7 @@ export class NotificationService {
                     name: address.city ?? address.town ?? address.village ?? address.municipality ?? place.name,
                     latitude: place.lat,
                     longitude: place.lon,
-                    times: this.config.notificationTimes,
+                    times: this.storageService.notificationTimes(),
                 })
             }
         })

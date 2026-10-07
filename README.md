@@ -13,7 +13,7 @@ App Ionic/Angular per consultare il meteo dei luoghi preferiti, distribuita come
 
 ### Notifiche a orario
 
-Gli orari delle notifiche sono in `notificationTimes` di [src/assets/config/app-config.json](src/assets/config/app-config.json) (ora `08:00` e `17:00`). La località è quella del preferito selezionato.
+Gli orari delle notifiche si impostano dalla pagina **Notifications** del menu e restano salvati nel `localStorage` (al primo avvio `08:00` e `17:00`). La località è quella del preferito selezionato.
 
 Il Background Runner **non** può partire a un orario preciso. Android lo esegue "circa" ogni `interval` minuti (minimo 15), quando gli conviene. Per avere una notifica alle 8:00 si combinano due meccanismi:
 
@@ -168,13 +168,13 @@ Il plugin non ha un'API per annullare una notifica programmata: il runner la rip
 [NotificationService](src/app/core/services/notification.service.ts) parte con `AppComponent` e tiene aggiornato il runner:
 
 - prende latitudine e longitudine dal geocoding (Nominatim) del preferito selezionato, quello avviato dalla home;
-- prende gli orari da `notificationTimes` in `app-config.json`;
+- prende gli orari scelti nella pagina Notifications ([NotificationsComponent](src/app/folder/notifications.component.ts)), salvati da `StorageService` nel `localStorage`;
 - chiede il permesso per le notifiche (obbligatorio da Android 13, il popup compare solo la prima volta);
 - invia tutto al runner con `BackgroundRunner.dispatchEvent`.
 
 Nel browser (`npm start`) il servizio non fa nulla, perché il runner esiste solo nell'app Android.
 
-Per cambiare gli orari basta modificare `notificationTimes` (formato `HH:mm`, ora del telefono), poi rifare build e sync e aprire l'app una volta.
+Per cambiare gli orari basta aggiungerli o eliminarli dalla pagina Notifications (formato `HH:mm`, ora del telefono): il runner viene aggiornato subito, senza rifare build e sync.
 
 ---
 
@@ -208,13 +208,13 @@ In Android Studio seleziona il telefono collegato in alto e premi **Run ▶**. I
 
 Non aspettare il giro periodico. Durante lo sviluppo:
 
-1. In `app-config.json` aggiungi a `notificationTimes` un orario fra 5 minuti (es. `"10:42"`).
-2. `npm run build`, poi `npx cap sync android`, poi Run da Android Studio.
-3. Con un preferito selezionato, apri la home: in Logcat deve comparire `[runner] programmate N notifiche`.
+1. `npm run build`, poi `npx cap sync android`, poi Run da Android Studio.
+2. Con un preferito selezionato, apri la home, poi dalla pagina Notifications aggiungi un orario fra 5 minuti (es. `10:42`).
+3. In Logcat deve comparire `[runner] programmate N notifiche`.
 4. Chiudi l'app e blocca lo schermo.
 5. La notifica deve arrivare all'orario preciso. Se arriva con 1-2 ore di anticipo, è il problema del fuso orario descritto sopra.
 
-Finito il test, rimetti gli orari originali, rifai build e sync e riapri l'app: il runner annulla da solo la notifica di prova.
+Finito il test, elimina l'orario di prova dalla pagina Notifications: il runner annulla da solo la notifica programmata.
 
 Per forzare un giro periodico senza aspettare Android, dalla console di `chrome://inspect`:
 

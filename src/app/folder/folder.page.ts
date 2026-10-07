@@ -3,6 +3,7 @@ import { IonButtons, IonContent, IonHeader, IonMenuButton, IonTitle, IonToolbar 
 import { ApiService } from '../core/services/api.service';
 import { HomeComponent } from './home.component';
 import { FavoritesComponent } from './favorites.component';
+import { NotificationsComponent } from './notifications.component';
 
 
 @Component({
@@ -31,6 +32,9 @@ import { FavoritesComponent } from './favorites.component';
         @case ('Favorites') {
           <fra-favorites/>
         }
+        @case ('Notifications') {
+          <fra-notifications/>
+        }
       }
       
     </ion-content>
@@ -46,7 +50,7 @@ ion-content::part(background) {
 
 
   `,
-  imports: [IonHeader, IonToolbar, IonButtons, IonMenuButton, IonTitle, IonContent, HomeComponent, FavoritesComponent],
+  imports: [IonHeader, IonToolbar, IonButtons, IonMenuButton, IonTitle, IonContent, HomeComponent, FavoritesComponent, NotificationsComponent],
 })
 export default class FolderPage {
   readonly folder = input.required<string>();

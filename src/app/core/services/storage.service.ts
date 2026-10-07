@@ -3,12 +3,18 @@ import { ISettings } from '../../models/ISettings';
 import { AppConfig } from '../../app-config-token';
 import { ICoordinatesParams } from '../../models/IQueryParams';
 
+// orari usati finché l'utente non ne salva di suoi dalla pagina Notifications
+const DEFAULT_NOTIFICATION_TIMES = ['08:00', '17:00']
+
 @Service()
 export class StorageService {
     private FAVORITE_PREFIX = 'favorite|'
     private SELECTED_KEY = 'selectedFavorite'
+    private NOTIFICATION_TIMES_KEY = 'notificationTimes'
     private config: ISettings = inject(AppConfig)
     public favoriteList = signal<ICoordinatesParams[]>([])
+    // orari delle notifiche meteo nel formato HH:mm, ora locale del telefono
+    public notificationTimes = signal<string[]>(this.readNotificationTimes())
     // contiene la chiave di storage del preferito selezionato, non l'oggetto
     public selectedKey = signal<string | null>(localStorage.getItem(this.SELECTED_KEY))
     public selectedFavorite = computed<ICoordinatesParams | null>(() => {
@@ -81,6 +87,22 @@ export class StorageService {
             }
         }
         this.favoriteList.set(items)
+    }
+
+    public setNotificationTimes(times: string[]): void{
+        // in ordine cronologico: con il formato HH:mm basta l'ordine alfabetico
+        const sorted = [...times].sort()
+        localStorage.setItem(this.NOTIFICATION_TIMES_KEY, JSON.stringify(sorted))
+        this.notificationTimes.set(sorted)
+    }
+
+    private readNotificationTimes(): string[]{
+        try {
+            const storageItem: string | null = localStorage.getItem(this.NOTIFICATION_TIMES_KEY)
+            return storageItem ? JSON.parse(storageItem) : DEFAULT_NOTIFICATION_TIMES
+        } catch {
+            return DEFAULT_NOTIFICATION_TIMES
+        }
     }
 
     private buildStorageKey(coordinatesParam: ICoordinatesParams): string{
