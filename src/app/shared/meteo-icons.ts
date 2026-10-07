@@ -19,7 +19,8 @@ export const METEO_ICONS = new Map<MeteoCondition, string>([
 ]);
 
 // la risposta non ha un weather code: la condizione dell'ora i si ricava dai valori hourly
-// (precipitazioni in mm/h con le soglie WMO 2.5 e 7.6, raffiche in km/h, nuvolosità in %)
+// (precipitazioni in mm/h con le soglie WMO 2.5 e 7.6, raffiche in km/h, nuvolosità in %).
+// La funzione condition in src/runners/runner.js ripete queste soglie per le notifiche
 export function getMeteoCondition(meteo: IMeteoResponse, i: number): MeteoCondition {
   const { hourly, daily } = meteo;
   const time = hourly.time[i];

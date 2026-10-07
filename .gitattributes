@@ -1,0 +1,2 @@
+# patch-package applica le patch solo con fine riga LF
+patches/*.patch text eol=lf

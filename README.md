@@ -43,6 +43,8 @@ npx cap sync android
 npx cap open android
 ```
 
+`npm install` applica anche la patch del plugin (passo f): nell'output deve comparire `@capacitor/background-runner@3.0.0 ✔`.
+
 **Non** eseguire `npx cap add android`: serve solo la prima volta, quando `android/` non esiste ancora.
 
 ---
@@ -157,7 +159,21 @@ Il runner gira in un motore JavaScript separato dalla WebView. Non può usare An
 | `clearSettings` | L'app, quando non c'è un preferito selezionato | Cancella le impostazioni e annulla le notifiche già programmate |
 | `checkMeteo` | Android, circa ogni `interval` minuti | Riscarica le previsioni e riprogramma le notifiche con dati freschi |
 
-Ogni notifica riporta minima, massima e pioggia del giorno in cui arriva. Le previsioni scaricate restano in `CapacitorKV` come riserva quando manca la rete.
+Ogni notifica confronta l'ora in cui arriva con la stessa ora del giorno prima, nel formato `ieri → oggi`:
+
+```
+Meteo Milano · ieri → oggi
+Meteo: Nuvoloso → Pioggia leggera
+Temperatura: 22° → 18°
+Percepita: 20° → 19°
+Vento: 9 → 5 km/h
+```
+
+- Il runner usa i dati dell'ora piena: alle 8:30 quelli delle 8:00. Per avere anche ieri scarica le previsioni con `past_days=1`.
+- Chiusa, la notifica mostra una riga sola con temperatura e meteo. Espansa, mostra le quattro righe, ma solo con la patch del plugin (passo f).
+- La condizione meteo (Sereno, Nuvoloso, Pioggia leggera…) usa le stesse soglie di `getMeteoCondition` in [meteo-icons.ts](src/app/shared/meteo-icons.ts). Se le cambi in un file, cambiale anche nell'altro.
+
+Le previsioni scaricate restano in `CapacitorKV` come riserva quando manca la rete.
 
 Il plugin non ha un'API per annullare una notifica programmata: il runner la riprogramma con lo stesso `id` al 2100.
 
@@ -175,6 +191,20 @@ Il plugin non ha un'API per annullare una notifica programmata: il runner la rip
 Nel browser (`npm start`) il servizio non fa nulla, perché il runner esiste solo nell'app Android.
 
 Per cambiare gli orari basta aggiungerli o eliminarli dalla pagina Notifications (formato `HH:mm`, ora del telefono): il runner viene aggiornato subito, senza rifare build e sync.
+
+#### f) Patch del plugin: notifiche espanse
+
+La versione 3.0.0 del Background Runner dichiara l'opzione `largeBody` (testo su più righe quando la notifica è espansa), ma su Android la ignora: non la legge e non applica lo stile `BigTextStyle`. Senza correzione il testo resta su una riga sola, troncato.
+
+```bash
+npm install -D patch-package
+```
+
+La correzione sta in [patches/@capacitor+background-runner+3.0.0.patch](patches/@capacitor+background-runner+3.0.0.patch). `patch-package` la applica dopo ogni `npm install`, grazie allo script `postinstall` in `package.json`. Android Studio compila il plugin direttamente da `node_modules/` (vedi `android/capacitor.settings.gradle`), quindi basta la solita build.
+
+- `.gitattributes` tiene la patch con fine riga LF. Con `core.autocrlf=true` Git la convertirebbe in CRLF, e la patch metterebbe righe CRLF nei file Kotlin del plugin.
+- Quando aggiorni il plugin, `npm install` avvisa se la patch non si applica più. Controlla se la nuova versione ha già corretto il problema: in quel caso cancella la patch.
+- Per modificare la patch, cambia i file in `node_modules/@capacitor/background-runner/android/` e rigenerala con `npx patch-package @capacitor/background-runner`. Prima cancella le cartelle `android/build` e `android/.gradle` dentro il plugin. Sono cache di Gradle e si rigenerano, ma su Windows i loro percorsi troppo lunghi fanno fallire il comando, e l'opzione `--exclude` non funziona.
 
 ---
 
@@ -213,6 +243,7 @@ Non aspettare il giro periodico. Durante lo sviluppo:
 3. In Logcat deve comparire `[runner] programmate N notifiche`.
 4. Chiudi l'app e blocca lo schermo.
 5. La notifica deve arrivare all'orario preciso. Se arriva con 1-2 ore di anticipo, è il problema del fuso orario descritto sopra.
+6. Espandi la notifica: deve mostrare le quattro righe `ieri → oggi`. Se resta su una riga, la patch del plugin non è applicata (passo f).
 
 Finito il test, elimina l'orario di prova dalla pagina Notifications: il runner annulla da solo la notifica programmata.
 
@@ -241,6 +272,7 @@ Scegli un tipo di firma e non cambiarlo più. Android rifiuta un aggiornamento f
 **Da committare:**
 
 - `src/`, compreso `src/runners/runner.js`
+- `patches/` e `.gitattributes` (patch del plugin, passo f)
 - `angular.json`, `package.json`, `package-lock.json`, `capacitor.config.ts`, `ionic.config.json`, `tsconfig*.json`
 - `README.md`, `requirements.txt`
 - `android/`: tutto quello che non è escluso da `android/.gitignore`, cioè file Gradle, wrapper `gradlew`, `AndroidManifest.xml`, `MainActivity`, icone e risorse in `res/`

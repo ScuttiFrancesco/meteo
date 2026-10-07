@@ -54,7 +54,8 @@ async function scheduleNotifications() {
   if (!settings) return;
 
   const meteo = await loadForecast(settings);
-  if (!meteo) return;
+  // le previsioni salvate dalla versione precedente del runner non hanno i dati orari
+  if (!meteo || !meteo.hourly) return;
 
   // ora attuale nel fuso della località, da leggere con i metodi getUTC*
   const now = new Date(Date.now() + meteo.utc_offset_seconds * 1000);
@@ -64,15 +65,17 @@ async function scheduleNotifications() {
     const [hours, minutes] = time.split(':').map(Number);
     const at = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate(), hours, minutes));
     if (at <= now) at.setUTCDate(at.getUTCDate() + 1);
+    const dayBefore = new Date(at);
+    dayBefore.setUTCDate(dayBefore.getUTCDate() - 1);
 
-    // daily.time contiene le date nel formato yyyy-MM-dd, nel fuso della località
-    const day = meteo.daily.time.indexOf(at.toISOString().slice(0, 10));
-    if (day < 0) return; // previsioni salvate troppo vecchie per quel giorno
+    const today = hourIndex(meteo, at);
+    const yesterday = hourIndex(meteo, dayBefore);
+    if (today < 0 || yesterday < 0) return; // previsioni salvate troppo vecchie per quel giorno
 
     notifications.push({
       id: FIRST_NOTIFICATION_ID + i,
-      title: `Meteo ${settings.name}`,
-      body: buildBody(meteo.daily, day),
+      title: `Meteo ${settings.name} · ieri → oggi`,
+      ...buildComparison(meteo, yesterday, today),
       // il plugin legge questa data come ora locale del telefono e ignora la "Z" (vedi README)
       scheduleAt: at.toISOString(),
     });
@@ -85,8 +88,10 @@ async function scheduleNotifications() {
 async function loadForecast(settings) {
   const url = 'https://api.open-meteo.com/v1/forecast'
     + `?latitude=${settings.latitude}&longitude=${settings.longitude}`
-    + '&daily=temperature_2m_min,temperature_2m_max,precipitation_probability_max,precipitation_sum'
-    + '&timezone=auto&forecast_days=3';
+    + '&hourly=temperature_2m,apparent_temperature,precipitation,snowfall,cloudcover,windspeed_10m,windgusts_10m'
+    + '&daily=sunrise,sunset'
+    // past_days=1 per avere anche ieri, da confrontare con oggi
+    + '&timezone=auto&past_days=1&forecast_days=3';
   try {
     const response = await fetch(url);
     if (!response.ok) throw new Error('HTTP ' + response.status);
@@ -100,12 +105,49 @@ async function loadForecast(settings) {
   }
 }
 
-function buildBody(daily, day) {
-  const min = Math.round(daily.temperature_2m_min[day]);
-  const max = Math.round(daily.temperature_2m_max[day]);
-  const probability = daily.precipitation_probability_max[day] ?? 0;
-  const rain = daily.precipitation_sum[day] ?? 0;
-  return `Oggi ${min}° / ${max}° · pioggia ${probability}% (${rain} mm)`;
+// hourly.time contiene le ore nel formato yyyy-MM-ddTHH:00, nel fuso della località:
+// la notifica usa l'ora piena (alle 8:30 i dati delle 8:00)
+function hourIndex(meteo, date) {
+  return meteo.hourly.time.indexOf(date.toISOString().slice(0, 13) + ':00');
+}
+
+// ogni dato è "valore di ieri → valore di oggi", alla stessa ora
+function buildComparison(meteo, yesterday, today) {
+  const hourly = meteo.hourly;
+  const degrees = (value) => `${Math.round(value)}°`;
+  const compare = (key, format) => `${format(hourly[key][yesterday])} → ${format(hourly[key][today])}`;
+
+  const weather = `${condition(meteo, yesterday)} → ${condition(meteo, today)}`;
+  const temperature = compare('temperature_2m', degrees);
+  return {
+    // notifica chiusa: una riga sola
+    body: `${temperature} · ${weather}`,
+    // notifica espansa: il plugin la mostra solo con la patch in patches/ (vedi README)
+    largeBody: [
+      `Meteo: ${weather}`,
+      `Temperatura: ${temperature}`,
+      `Percepita: ${compare('apparent_temperature', degrees)}`,
+      `Vento: ${compare('windspeed_10m', Math.round)} km/h`,
+    ].join('\n'),
+  };
+}
+
+// stessa logica di getMeteoCondition in src/app/shared/meteo-icons.ts, con le etichette in italiano
+function condition(meteo, i) {
+  const { hourly, daily } = meteo;
+  const time = hourly.time[i];
+  const day = daily.time.indexOf(time.slice(0, 10));
+  const isNight = time < daily.sunrise[day] || time > daily.sunset[day];
+
+  if (hourly.snowfall[i] > 0) return 'Neve';
+  if (hourly.precipitation[i] > 7.6) return 'Pioggia torrenziale';
+  if (hourly.precipitation[i] > 2.5) return 'Pioggia forte';
+  if (hourly.precipitation[i] > 0) return hourly.cloudcover[i] < 70 ? 'Rovesci' : 'Pioggia leggera';
+  if (hourly.windgusts_10m[i] > 50) return 'Ventoso';
+  if (hourly.cloudcover[i] > 70) return 'Nuvoloso';
+  if (isNight) return 'Sereno';
+  if (hourly.cloudcover[i] > 30) return 'Parz. nuvoloso';
+  return 'Soleggiato';
 }
 
 // il plugin non ha un'API per annullare una notifica programmata:
