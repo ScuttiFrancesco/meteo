@@ -133,9 +133,9 @@ function buildComparison(meteo, yesterday, today) {
   };
 }
 
-// stessa logica di windDirection in src/app/shared/wind.ts, con le sigle italiane (O = ovest)
+// stessa logica di windDirection in src/app/shared/wind.ts
 function windDirection(degrees) {
-  return ['N', 'NE', 'E', 'SE', 'S', 'SO', 'O', 'NO'][Math.round(degrees / 45) % 8];
+  return ['N', 'NE', 'E', 'SE', 'S', 'SW', 'W', 'NW'][Math.round(degrees / 45) % 8];
 }
 
 // stessa logica di getMeteoCondition in src/app/shared/meteo-icons.ts, con le etichette in italiano
