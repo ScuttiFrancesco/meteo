@@ -1,11 +1,14 @@
 import { Component, computed, inject, input } from '@angular/core';
 import { DatePipe } from '@angular/common';
-import { IonButton, IonButtons, IonContent, IonHeader, IonItem, IonLabel, IonTitle, IonToolbar, ModalController } from '@ionic/angular';
+import { IonButton, IonButtons, IonContent, IonHeader, IonItem, IonLabel, IonTitle, IonToolbar, ModalController, IonIcon } from '@ionic/angular';
+import { addIcons } from 'ionicons';
+import { navigate } from 'ionicons/icons';
 import { IMeteoResponse } from '../models/IMeteoResponse';
 import { getMeteoCondition, METEO_ICONS } from '../shared/meteo-icons';
+import { windArrowRotation, windDirection } from '../shared/wind';
 
 @Component({
-  imports: [DatePipe, IonButton, IonButtons, IonContent, IonHeader, IonItem, IonLabel, IonTitle, IonToolbar],
+  imports: [DatePipe, IonButton, IonButtons, IonContent, IonHeader, IonItem, IonLabel, IonTitle, IonToolbar, IonIcon],
   selector: 'fra-hourly-meteo-modal',
   styles: `
     ion-content::part(background) {
@@ -22,6 +25,11 @@ import { getMeteoCondition, METEO_ICONS } from '../shared/meteo-icons';
 
     img {
       width: 48px;
+    }
+
+    p ion-icon {
+      margin-inline-start: 4px;
+      vertical-align: -2px;
     }
   `,
   template: `
@@ -41,7 +49,7 @@ import { getMeteoCondition, METEO_ICONS } from '../shared/meteo-icons';
             <h2>{{ hour.time }} · {{ hour.temperature }}</h2>
             <p>Feels like {{ hour.apparentTemperature }} · Humidity {{ hour.humidity }} · Clouds {{ hour.cloudcover }}</p>
             <p>Precipitation {{ hour.precipitation }} · Rain {{ hour.rain }} · Snow {{ hour.snowfall }}</p>
-            <p>Wind {{ hour.windspeed }} · Gusts {{ hour.windgusts }} · Direction {{ hour.winddirection }}</p>
+            <p>Wind {{ hour.windspeed }} · Gusts {{ hour.windgusts }} · Direction {{ hour.winddirection }}<ion-icon name="navigate" [style.rotate.deg]="hour.windRotation" aria-hidden="true"></ion-icon></p>
           </ion-label>
         </ion-item>
       }
@@ -77,10 +85,15 @@ export class HourlyMeteoModalComponent {
         snowfall: value('snowfall'),
         windspeed: value('windspeed_10m'),
         windgusts: value('windgusts_10m'),
-        winddirection: value('winddirection_10m'),
+        winddirection: windDirection(hourly.winddirection_10m[i]),
+        windRotation: windArrowRotation(hourly.winddirection_10m[i]),
       }]
     })
   })
+
+  constructor() {
+    addIcons({ navigate })
+  }
 
   close() {
     this.modalCtrl.dismiss();

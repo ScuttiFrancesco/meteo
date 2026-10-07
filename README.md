@@ -166,12 +166,13 @@ Meteo Milano · ieri → oggi
 Meteo: Nuvoloso → Pioggia leggera
 Temperatura: 22° → 18°
 Percepita: 20° → 19°
-Vento: 9 → 5 km/h
+Vento: 9 km/h NO → 5 km/h SO
 ```
 
 - Il runner usa i dati dell'ora piena: alle 8:30 quelli delle 8:00. Per avere anche ieri scarica le previsioni con `past_days=1`.
 - Chiusa, la notifica mostra una riga sola con temperatura e meteo. Espansa, mostra le quattro righe, ma solo con la patch del plugin (passo f).
 - La condizione meteo (Sereno, Nuvoloso, Pioggia leggera…) usa le stesse soglie di `getMeteoCondition` in [meteo-icons.ts](src/app/shared/meteo-icons.ts). Se le cambi in un file, cambiale anche nell'altro.
+- La direzione del vento è quella da cui arriva, in 8 punti cardinali con le sigle italiane (N, NE, E, SE, S, SO, O, NO). L'app usa le sigle inglesi, con la stessa logica di `windDirection` in [wind.ts](src/app/shared/wind.ts).
 
 Le previsioni scaricate restano in `CapacitorKV` come riserva quando manca la rete.
 

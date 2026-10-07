@@ -33,6 +33,8 @@ export interface IMeteoResponse {
         apparent_temperature_min: string;
         sunrise: string;
         sunset: string;
+        windspeed_10m_max: string;
+        winddirection_10m_dominant: string;
     };
     daily: {
         time: string[];
@@ -42,5 +44,7 @@ export interface IMeteoResponse {
         apparent_temperature_min: number[];
         sunrise: string[];
         sunset: string[];
+        windspeed_10m_max: number[];
+        winddirection_10m_dominant: number[];
     };
 }

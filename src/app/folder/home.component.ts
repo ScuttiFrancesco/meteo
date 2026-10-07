@@ -3,10 +3,11 @@ import { formatDate } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import { IonButton, IonIcon, IonRouterLink, IonSpinner, ModalController } from '@ionic/angular';
 import { addIcons } from 'ionicons';
-import { alertCircleOutline, compassOutline, heartOutline, locationOutline, moonOutline, searchOutline, sunnyOutline } from 'ionicons/icons';
+import { alertCircleOutline, compassOutline, heartOutline, locationOutline, moonOutline, navigate, searchOutline, sunnyOutline } from 'ionicons/icons';
 import { StorageService } from '../core/services/storage.service';
 import { ApiService } from '../core/services/api.service';
 import { getMeteoCondition, METEO_ICONS } from '../shared/meteo-icons';
+import { windArrowRotation, windDirection } from '../shared/wind';
 import { HourlyMeteoModalComponent } from './hourly-meteo-modal.component';
 
 // etichette dei giorni nell'ordine di daily.time (chiediamo da 2 giorni fa a fra 3 giorni)
@@ -126,12 +127,30 @@ function dayFromToday(offset: number): string {
   .current {
     display: flex;
     align-items: center;
-    gap: 12px;
+    gap: 24px;
   }
   .temperature {
     font-size: clamp(28px, 8.5vw, 48px);
     font-weight: 700;
     letter-spacing: -0.02em;
+  }
+  .wind {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    padding: 4px 10px 4px 6px;
+    border-radius: 999px;
+    font-size: clamp(12px, 3.6vw, 16px);
+    font-weight: 700;
+    color: var(--fra-accent);
+    background: rgba(104, 21, 236, 0.1);
+  }
+  .wind img {
+    height: 2.4em;
+    margin: -0.2em 0;
+  }
+  .wind ion-icon {
+    font-size: 1.3em;
   }
   .meteo-icon {
     height: clamp(64px, 18vw, 128px);
@@ -267,6 +286,16 @@ function dayFromToday(offset: number): string {
     margin-inline-end: 4px;
     vertical-align: -2px;
   }
+  /* alba e tramonto sulla stessa riga: sugli schermi più stretti il tramonto va a capo */
+  .day-sun {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    column-gap: 6px;
+  }
+  .day-sun > span {
+    white-space: nowrap;
+  }
   @keyframes fade-in {
     from { opacity: 0; transform: translateY(12px); }
     to { opacity: 1; transform: none; }
@@ -316,6 +345,11 @@ function dayFromToday(offset: number): string {
               <div class="current">
                 <img class="meteo-icon" [src]="current.icon" [alt]="current.condition"/>
                 <span class="temperature">{{ current.temperature }}</span>
+                <span class="wind" role="img" [attr.aria-label]="'Wind from ' + current.windDirection">
+                  <img [src]="windIcon" alt=""/>
+                  <ion-icon name="navigate" [style.rotate.deg]="current.windRotation" aria-hidden="true"></ion-icon>
+                  <span aria-hidden="true">{{ current.windDirection }}</span>
+                </span>
               </div>
             }
             <div class="card-info">
@@ -357,8 +391,11 @@ function dayFromToday(offset: number): string {
                   <span class="day-label">{{ day.label }}</span>
                   <span class="day-temp">{{ day.max }} / {{ day.min }}</span>
                   <span class="day-feels">Feels {{ day.feelsMax }} / {{ day.feelsMin }}</span>
-                  <span><ion-icon name="sunny-outline" aria-label="Sunrise"></ion-icon>{{ day.sunrise }}</span>
-                  <span><ion-icon name="moon-outline" aria-label="Sunset"></ion-icon>{{ day.sunset }}</span>
+                  <span><ion-icon name="navigate" [style.rotate.deg]="day.windRotation" aria-label="Wind"></ion-icon>{{ day.wind }} {{ day.windDirection }}</span>
+                  <span class="day-sun">
+                    <span><ion-icon name="sunny-outline" aria-label="Sunrise"></ion-icon>{{ day.sunrise }}</span>
+                    <span><ion-icon name="moon-outline" aria-label="Sunset"></ion-icon>{{ day.sunset }}</span>
+                  </span>
                 </button>
               }
             </div>
@@ -377,6 +414,8 @@ export class HomeComponent {
   protected readonly meteo = this.apiService.meteo
   private readonly meteoData = computed(() => this.meteo.hasValue() ? this.meteo.value() : null)
   protected selectedFavorite = computed(() => this.storageService.selectedFavorite())
+  // manica a vento, la stessa icona della condizione Windy
+  protected readonly windIcon = METEO_ICONS.get('Windy')
   // dati mostrati in pagina, presi dal primo risultato del geocoding (il più rilevante per Nominatim)
   protected readonly place = computed(() => {
     // in stato di errore value() lancia un'eccezione: hasValue() lo evita
@@ -402,10 +441,13 @@ export class HomeComponent {
     const i = meteo.hourly.time.indexOf(formatDate(new Date(), "yyyy-MM-dd'T'HH:00", 'en-US'))
     if (i < 0) return null
     const condition = getMeteoCondition(meteo, i)
+    const windDegrees = meteo.hourly.winddirection_10m[i]
     return {
       condition,
       icon: METEO_ICONS.get(condition),
       temperature: `${Math.round(meteo.hourly.temperature_2m[i])}${meteo.hourly_units.temperature_2m}`,
+      windDirection: windDirection(windDegrees),
+      windRotation: windArrowRotation(windDegrees),
     }
   })
   // sezioni del footer: prima riga da oggi a 2 giorni fa, seconda riga i prossimi 3 giorni
@@ -423,6 +465,10 @@ export class HomeComponent {
       min: temperature('temperature_2m_min', i),
       feelsMax: temperature('apparent_temperature_max', i),
       feelsMin: temperature('apparent_temperature_min', i),
+      // vento massimo del giorno e direzione prevalente
+      wind: `${Math.round(daily.windspeed_10m_max[i])} ${daily_units.windspeed_10m_max}`,
+      windDirection: windDirection(daily.winddirection_10m_dominant[i]),
+      windRotation: windArrowRotation(daily.winddirection_10m_dominant[i]),
       sunrise: daily.sunrise[i].slice(11),
       sunset: daily.sunset[i].slice(11),
     }))
@@ -436,6 +482,7 @@ export class HomeComponent {
       heartOutline,
       locationOutline,
       moonOutline,
+      navigate,
       searchOutline,
       sunnyOutline
     })

@@ -54,8 +54,8 @@ async function scheduleNotifications() {
   if (!settings) return;
 
   const meteo = await loadForecast(settings);
-  // le previsioni salvate dalla versione precedente del runner non hanno i dati orari
-  if (!meteo || !meteo.hourly) return;
+  // le previsioni salvate dalle versioni precedenti del runner non hanno tutti i dati orari
+  if (!meteo || !meteo.hourly || !meteo.hourly.winddirection_10m) return;
 
   // ora attuale nel fuso della località, da leggere con i metodi getUTC*
   const now = new Date(Date.now() + meteo.utc_offset_seconds * 1000);
@@ -88,7 +88,7 @@ async function scheduleNotifications() {
 async function loadForecast(settings) {
   const url = 'https://api.open-meteo.com/v1/forecast'
     + `?latitude=${settings.latitude}&longitude=${settings.longitude}`
-    + '&hourly=temperature_2m,apparent_temperature,precipitation,snowfall,cloudcover,windspeed_10m,windgusts_10m'
+    + '&hourly=temperature_2m,apparent_temperature,precipitation,snowfall,cloudcover,windspeed_10m,windgusts_10m,winddirection_10m'
     + '&daily=sunrise,sunset'
     // past_days=1 per avere anche ieri, da confrontare con oggi
     + '&timezone=auto&past_days=1&forecast_days=3';
@@ -116,6 +116,7 @@ function buildComparison(meteo, yesterday, today) {
   const hourly = meteo.hourly;
   const degrees = (value) => `${Math.round(value)}°`;
   const compare = (key, format) => `${format(hourly[key][yesterday])} → ${format(hourly[key][today])}`;
+  const wind = (i) => `${Math.round(hourly.windspeed_10m[i])} km/h ${windDirection(hourly.winddirection_10m[i])}`;
 
   const weather = `${condition(meteo, yesterday)} → ${condition(meteo, today)}`;
   const temperature = compare('temperature_2m', degrees);
@@ -127,9 +128,14 @@ function buildComparison(meteo, yesterday, today) {
       `Meteo: ${weather}`,
       `Temperatura: ${temperature}`,
       `Percepita: ${compare('apparent_temperature', degrees)}`,
-      `Vento: ${compare('windspeed_10m', Math.round)} km/h`,
+      `Vento: ${wind(yesterday)} → ${wind(today)}`,
     ].join('\n'),
   };
+}
+
+// stessa logica di windDirection in src/app/shared/wind.ts, con le sigle italiane (O = ovest)
+function windDirection(degrees) {
+  return ['N', 'NE', 'E', 'SE', 'S', 'SO', 'O', 'NO'][Math.round(degrees / 45) % 8];
 }
 
 // stessa logica di getMeteoCondition in src/app/shared/meteo-icons.ts, con le etichette in italiano

@@ -24,7 +24,7 @@
     },
     "staticParams": {
       "hourly": "temperature_2m,relativehumidity_2m,apparent_temperature,precipitation,rain,snowfall,cloudcover,windspeed_10m,windgusts_10m,winddirection_10m",
-      "daily": "temperature_2m_max,temperature_2m_min,apparent_temperature_max,apparent_temperature_min,sunrise,sunset",
+      "daily": "temperature_2m_max,temperature_2m_min,apparent_temperature_max,apparent_temperature_min,sunrise,sunset,windspeed_10m_max,winddirection_10m_dominant",
       "timezone": "auto"
     }
   },
